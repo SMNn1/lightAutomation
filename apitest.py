@@ -1,3 +1,4 @@
+from reptimer import RepeatedTimer
 import requests, json, random, time
 
 
@@ -57,9 +58,35 @@ def switchRandomColor(lightName):
             requests.put(baseurl + 'lights/' + lightNr + '/state', json = payload, timeout=1)
             return colorCode
 
-while True:
-    print(switchRandomColor('Playroom Decke Kugel'))
-    time.sleep(0.5)
+def fadingColors(lightName):
+    lights = getListOfHueLights()
+    for light in lights:
+        if lights[light]['name'] == lightName:
+            colorCode = lights[light]['state']['hue']
+            while True:
+                colorCode = incrementColorCode(colorCode, 2)
+                payload = {
+                    'hue': colorCode,
+                    'sat': 254,
+                    'bri': 254
+                }
+                requests.put(baseurl + 'lights/' + light + '/state', json = payload, timeout=1)
+                time.sleep(0.5)
+
+def incrementColorCode(colorCode, speed):
+    increAmount = random.randint(500,1000) * speed
+    if (colorCode + 600) > 65535:
+        colorCode = 0
+    colorCode = colorCode + increAmount
+    return colorCode
+
+fadingColors('Playroom Decke Kugel')
+
+
+
+# while True:
+#     print(switchRandomColor('Bad Decke'))
+#     time.sleep(0.5)
 
 # payload = {
 #     'hue': 20000,
