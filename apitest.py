@@ -10,6 +10,7 @@ baseurl = 'http://192.168.2.19/api/RAinKmADdhVuOV--GVyptV-u4QaxpNaVGBG5N1cr/'
 
 # print(r.text)
 
+
 def getListOfHueLights():
     result = requests.get(baseurl + 'lights', timeout=1)
     return result.json()
@@ -67,6 +68,22 @@ def switchRandomColor(lightName):
             requests.put(baseurl + 'lights/' + lightNr + '/state', json = payload, timeout=1)
             return colorCode
 
+def switchRandomColorId(lightId):
+    colorCode = random.randint(0,65535)
+    lights = getListOfHueLights()
+    payload = {
+        'hue': colorCode,
+        'sat': 254,
+        'bri': 254
+    }
+    requests.put(baseurl + 'lights/' + lightId + '/state', json = payload, timeout=1)
+    return colorCode
+
+def partymode(lightId):
+    while allowExtraMode:
+        print(switchRandomColorId(lightId))
+        time.sleep(0.5)
+
 def fadingColors(lightName):
     lights = getListOfHueLights()
     for light in lights:
@@ -81,6 +98,22 @@ def fadingColors(lightName):
                 }
                 requests.put(baseurl + 'lights/' + light + '/state', json = payload, timeout=1)
                 time.sleep(0.2)
+
+allowExtraMode = False
+
+def fadingColorsId(lightId):
+    global allowExtraMode
+    lights = getListOfHueLights()
+    colorCode = lights[lightId]['state']['hue']
+    while allowExtraMode:
+        colorCode = incrementColorCode(colorCode, 1)
+        payload = {
+            'hue': colorCode,
+            'sat': 254,
+            'bri': 254
+        }
+        requests.put(baseurl + 'lights/' + lightId + '/state', json = payload, timeout=1)
+        time.sleep(0.2)
 
 def incrementColorCode(colorCode, speed):
     increAmount = random.randint(500,1000) * speed
@@ -111,7 +144,7 @@ def getLightsData():
 
 # fadingColors('Schlafzimmer Decke Blume')
 
-
+fadingColorsId('30')
 
 # while True:
 #     print(switchRandomColor('Bad Decke'))
@@ -134,4 +167,3 @@ def getLightsData():
 
 print(getListOfHueLights()['30']['state']['on'])
 
-switchHueLightId('30')
