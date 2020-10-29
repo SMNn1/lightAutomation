@@ -64,14 +64,14 @@ def fadingColors(lightName):
         if lights[light]['name'] == lightName:
             colorCode = lights[light]['state']['hue']
             while True:
-                colorCode = incrementColorCode(colorCode, 2)
+                colorCode = incrementColorCode(colorCode, 1)
                 payload = {
                     'hue': colorCode,
                     'sat': 254,
                     'bri': 254
                 }
                 requests.put(baseurl + 'lights/' + light + '/state', json = payload, timeout=1)
-                time.sleep(0.5)
+                time.sleep(0.2)
 
 def incrementColorCode(colorCode, speed):
     increAmount = random.randint(500,1000) * speed
@@ -80,7 +80,26 @@ def incrementColorCode(colorCode, speed):
     colorCode = colorCode + increAmount
     return colorCode
 
-fadingColors('Playroom Decke Kugel')
+def getLightsData():
+    lights = getListOfHueLights()
+    resArray = []
+    for light in lights:
+        lightName = lights[light]['name']
+        lightState = lights[light]['state']
+        lightStateOn = lights[light]['state']['on']
+        if "hue" in lightState:
+            lightStateHue = lights[light]['state']['hue']
+        else:
+            lightStateHue = -1
+        light = {
+            'name': lightName,
+            'on': lightStateOn,
+            'hue': lightStateHue,
+        }
+        resArray.append(light)
+    return resArray
+
+# fadingColors('Schlafzimmer Decke Blume')
 
 
 
@@ -96,3 +115,9 @@ fadingColors('Playroom Decke Kugel')
 # r = requests.put(baseurl + 'lights/30/state', json = payload, timeout=1)
 # print(r)
 
+results = getLightsData()
+for res in results:
+    print(res['name'])
+
+
+# name, type, state, color
