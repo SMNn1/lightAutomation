@@ -21,6 +21,15 @@ def switchHueLight(lightName, state):
             payload = {'on': state}
             requests.put(baseurl + 'lights/' + light + '/state', json = payload, timeout=1)
 
+def switchHueLightId(lightId):
+    stateOn = getListOfHueLights()[lightId]['state']['on']
+    if stateOn == True:
+        targetStateOn = False
+    elif stateOn == False:
+        targetStateOn = True
+    payload = {'on': targetStateOn}
+    requests.put(baseurl + 'lights/' + lightId + '/state', json = payload, timeout=1)
+
 def getListOfHueGroups():
     groupsDict = {}
     result = requests.get(baseurl + 'groups', timeout=1)
@@ -92,6 +101,7 @@ def getLightsData():
         else:
             lightStateHue = -1
         light = {
+            'id': light,
             'name': lightName,
             'on': lightStateOn,
             'hue': lightStateHue,
@@ -115,9 +125,13 @@ def getLightsData():
 # r = requests.put(baseurl + 'lights/30/state', json = payload, timeout=1)
 # print(r)
 
-results = getLightsData()
-for res in results:
-    print(res['name'])
+# results = getLightsData()
+# for res in results:
+#     print(res)
 
 
 # name, type, state, color
+
+print(getListOfHueLights()['30']['state']['on'])
+
+switchHueLightId('30')
